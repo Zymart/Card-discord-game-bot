@@ -1,51 +1,55 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sixssilicious | Menu</title>
+    <title>Sixssilicious | Official Menu</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <nav>
         <div class="logo">SIXSSILICIOUS</div>
-        <button id="admin-login-btn">Admin Login</button>
+        <button id="open-login-btn" class="nav-login-btn">Admin Login</button>
     </nav>
 
-    <main id="public-view">
-        <header>
+    <div id="public-site">
+        <header class="hero">
             <h1>SIXSSILICIOUS</h1>
-            <p class="tagline">GRITTY • SMOKY • BOLD</p>
+            <p class="tagline">PREMIUM FLAVOR • BOLD STYLE</p>
         </header>
 
-        <div class="container" id="menu-container">
-            <p class="no-items">The kitchen is prepping... check back soon for new items!</p>
-        </div>
-    </main>
+        <section class="container">
+            <h2 class="section-title">CURRENT MENU</h2>
+            <div id="menu-display">
+                <p class="placeholder-text">New flavors coming soon...</p>
+            </div>
+        </section>
+    </div>
 
     <div id="login-modal" class="modal">
-        <div class="modal-content">
-            <h2>TEAM ACCESS</h2>
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
-            <button id="auth-btn">Authorize</button>
-            <button id="close-btn" class="outline-btn">Cancel</button>
-            <p id="error-msg" class="error">Access Denied</p>
+        <div class="modal-box">
+            <h3>TEAM LOGIN</h3>
+            <input type="text" id="user-input" placeholder="Name">
+            <input type="password" id="pass-input" placeholder="Password">
+            <button id="submit-login">Login</button>
+            <button id="close-modal" class="cancel-btn">Back to Site</button>
+            <p id="login-error" class="error-msg">Invalid Credentials</p>
         </div>
     </div>
 
-    <div id="admin-panel" style="display: none;">
-        <div class="admin-banner">ADMIN MODE ACTIVE</div>
+    <div id="admin-panel" class="admin-area" style="display: none;">
+        <div class="status-bar">Logged in as Admin</div>
         <div class="container">
             <h3>Add New Product</h3>
-            <div class="add-form">
-                <input type="text" id="new-item-name" placeholder="Item Name">
-                <input type="text" id="new-item-desc" placeholder="Description">
-                <input type="text" id="new-item-price" placeholder="Price (e.g. $15)">
-                <button id="add-product-btn">Post to Menu</button>
+            <div class="form-group">
+                <input type="text" id="item-name" placeholder="Item Name (e.g., Smashed Burger)">
+                <input type="text" id="item-desc" placeholder="Description (e.g., Spicy and Cheesy)">
+                <input type="text" id="item-price" placeholder="Price (e.g., ₱150)">
+                <button id="post-btn">Post Product</button>
             </div>
-            <button id="logout-btn" class="outline-btn">Exit Admin Mode</button>
+            <button id="logout-btn" class="cancel-btn">Logout</button>
         </div>
     </div>
 
