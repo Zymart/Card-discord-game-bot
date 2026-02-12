@@ -4,7 +4,6 @@ const foodGrid = document.getElementById('food-grid');
 const drinksGrid = document.getElementById('drinks-grid');
 const adminDock = document.getElementById('admin-panel');
 
-// --- 1. CLOUD SYNC ---
 async function loadFromCloud() {
     try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, {
@@ -12,10 +11,7 @@ async function loadFromCloud() {
         });
         const data = await res.json();
         return data.recipes || [];
-    } catch (err) {
-        console.error("Fetch Error:", err);
-        return [];
-    }
+    } catch (err) { return []; }
 }
 
 async function saveToCloud(dataArray) {
@@ -26,28 +22,18 @@ async function saveToCloud(dataArray) {
             body: JSON.stringify({ "recipes": dataArray })
         });
         return true;
-    } catch (err) {
-        console.error("Save Error:", err);
-        return false;
-    }
+    } catch (err) { return false; }
 }
 
-// --- 2. REPEAT ANIMATION ---
 const scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-        } else {
-            entry.target.classList.remove('is-visible'); 
-        }
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+        else entry.target.classList.remove('is-visible');
     });
 }, { threshold: 0.1 });
 
-// --- 3. RENDERING ---
 async function draw() {
-    foodGrid.innerHTML = '';
-    drinksGrid.innerHTML = '';
-    
+    foodGrid.innerHTML = ''; drinksGrid.innerHTML = '';
     const posts = await loadFromCloud();
 
     posts.forEach((p) => {
@@ -59,21 +45,16 @@ async function draw() {
             <div class="card-content">
                 <span style="color:var(--accent); font-weight:700; font-size:0.7rem;">${p.cat}</span>
                 <h3 style="margin:5px 0;">${p.name}</h3>
-                <span class="price-tag">₱${p.price || '0'}</span>
+                <span class="price-display">₱${p.price || '0'}</span>
             </div>
         `;
-
-        if (p.cat === "Food") {
-            foodGrid.appendChild(card);
-        } else {
-            drinksGrid.appendChild(card);
-        }
-        
+        if (p.cat === "Food") foodGrid.appendChild(card);
+        else drinksGrid.appendChild(card);
         scrollObserver.observe(card);
     });
 }
 
-// --- 4. AUTH ---
+// LOGIN LOGIC
 if (localStorage.getItem('snb_auth') === 'true') {
     adminDock.style.display = 'block';
     document.getElementById('open-login-btn').style.display = 'none';
@@ -83,9 +64,7 @@ if (localStorage.getItem('snb_auth') === 'true') {
 document.getElementById('submit-login').onclick = () => {
     const user = document.getElementById('user-input').value;
     const pass = document.getElementById('pass-input').value;
-    const team = ["Zymart", "Brigette", "Lance", "Taduran"];
-
-    if (team.includes(user) && pass === "sixssiliciousteam") {
+    if (["Zymart", "Brigette", "Lance", "Taduran"].includes(user) && pass === "sixssiliciousteam") {
         localStorage.setItem('snb_auth', 'true');
         location.reload();
     } else {
@@ -93,7 +72,7 @@ document.getElementById('submit-login').onclick = () => {
     }
 };
 
-// --- 5. ADD PRODUCT WITH PRICE ---
+// ADD PRODUCT
 document.getElementById('add-btn').onclick = async () => {
     const name = document.getElementById('new-name').value;
     const price = document.getElementById('new-price').value;
@@ -102,32 +81,20 @@ document.getElementById('add-btn').onclick = async () => {
 
     if (name && price && cat && file) {
         const btn = document.getElementById('add-btn');
-        btn.innerText = "SYNCING...";
-        btn.disabled = true;
+        btn.innerText = "SYNCING..."; btn.disabled = true;
 
         const reader = new FileReader();
         reader.onload = async (e) => {
             let currentPosts = await loadFromCloud();
-            const newItem = { 
-                id: Date.now().toString(), 
-                name, 
-                price, // Saving the price
-                cat, 
-                img: e.target.result 
-            };
-            currentPosts.push(newItem);
-            
+            currentPosts.push({ id: Date.now().toString(), name, price, cat, img: e.target.result });
             if (await saveToCloud(currentPosts)) {
                 await draw();
                 document.getElementById('new-name').value = '';
                 document.getElementById('new-price').value = '';
             }
-            btn.innerText = "PUBLISH";
-            btn.disabled = false;
+            btn.innerText = "PUBLISH"; btn.disabled = false;
         };
         reader.readAsDataURL(file);
-    } else {
-        alert("Please fill in all fields (Name, Price, Category, and Image)");
     }
 };
 
@@ -140,11 +107,7 @@ window.removePost = async (id) => {
     }
 };
 
-document.getElementById('logout-btn').onclick = () => {
-    localStorage.clear();
-    location.reload();
-};
-
+document.getElementById('logout-btn').onclick = () => { localStorage.clear(); location.reload(); };
 document.getElementById('open-login-btn').onclick = () => document.getElementById('login-modal').style.display='flex';
 document.getElementById('close-modal').onclick = () => document.getElementById('login-modal').style.display='none';
 
