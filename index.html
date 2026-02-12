@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sixssilicious | Handcrafted Passion</title>
+    <title>Sixssilicious | Handcrafted</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
@@ -12,12 +12,7 @@
     <nav>
         <div class="nav-container">
             <div class="logo">🥗 SIXSSILICIOUS</div>
-            <ul class="nav-links">
-                <li>HOME</li>
-                <li>PRODUCTS</li>
-                <li>DRINKS</li>
-            </ul>
-            <button id="open-login-btn" class="admin-icon-btn">⚙️ Admin Login</button>
+            <button id="open-login-btn" class="admin-icon-btn">⚙️ Admin</button>
         </div>
     </nav>
 
@@ -27,7 +22,8 @@
     </header>
 
     <main class="container">
-        <div id="product-grid" class="grid"></div>
+        <div id="product-grid" class="grid">
+            </div>
     </main>
 
     <div id="login-modal" class="modal">
@@ -37,17 +33,20 @@
             <input type="password" id="pass-input" placeholder="Password">
             <button id="submit-login">Login</button>
             <button id="close-modal" class="cancel-link">Cancel</button>
-            <p id="error-msg" class="error">Access Denied: Check Name/Pass</p>
+            <p id="error-msg" class="error">Access Denied</p>
         </div>
     </div>
 
     <div id="admin-panel" class="admin-panel">
         <div class="admin-container">
-            <h3>Admin Tools:</h3>
-            <input type="text" id="new-name" placeholder="Food Name">
+            <h3>New Post:</h3>
+            <input type="text" id="new-name" placeholder="Item Name">
             <input type="text" id="new-cat" placeholder="Category">
-            <input type="text" id="new-img" placeholder="Image URL">
-            <button id="add-btn">Post Product</button>
+            <label class="file-upload">
+                📷 Upload Image
+                <input type="file" id="new-image-file" accept="image/*">
+            </label>
+            <button id="add-btn">Post to Website</button>
             <button id="logout-btn" class="logout">Logout</button>
         </div>
     </div>
