@@ -4,44 +4,62 @@ const API_KEY = '$2a$10$McXg3fOwbLYW3Sskgfroj.nzMjtwwubDEz08zXpBN32KQ.8MvCJgK';
 const grid = document.getElementById('product-grid');
 const adminDock = document.getElementById('admin-panel');
 
-// --- 1. CLOUD SYNC LOGIC ---
+// --- 1. CLOUD SYNC LOGIC (FIXED) ---
 async function loadFromCloud() {
     try {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+        // Adding ?meta=false ensures we get ONLY the product array
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, {
             headers: { 'X-Master-Key': API_KEY }
         });
+        if (!res.ok) throw new Error("Cloud Error");
         const data = await res.json();
-        return Array.isArray(data.record) ? data.record : (data.record.recipes || []);
+        return Array.isArray(data) ? data : [];
     } catch (err) {
-        return [];
+        console.warn("Cloud offline, loading local cache...");
+        return JSON.parse(localStorage.getItem('snb_cache')) || [];
     }
 }
 
 async function saveToCloud(data) {
-    await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-        body: JSON.stringify(data)
-    });
+    try {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+            method: 'PUT',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'X-Master-Key': API_KEY 
+            },
+            body: JSON.stringify(data)
+        });
+        if (res.ok) {
+            localStorage.setItem('snb_cache', JSON.stringify(data));
+            console.log("Cloud Updated!");
+        }
+    } catch (err) {
+        console.error("Cloud Save Failed:", err);
+    }
 }
 
-// --- 2. REPEAT SCROLL ANIMATION LOGIC ---
+// --- 2. REPEAT SCROLL ANIMATION ---
 const scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('is-visible');
         } else {
-            // This allows the animation to play again when you scroll back
+            // Reset state when scrolling away
             entry.target.classList.remove('is-visible'); 
         }
     });
 }, { threshold: 0.1 });
 
-// --- 3. RENDER FUNCTION ---
+// --- 3. RENDERING ---
 async function draw() {
-    grid.innerHTML = '<p style="color:var(--accent); text-align:center; width:100%;">Syncing...</p>';
+    grid.innerHTML = '<p style="color:var(--accent); text-align:center; width:100%;">Syncing Cloud Data...</p>';
     const posts = await loadFromCloud();
     grid.innerHTML = '';
+
+    if (posts.length === 0) {
+        grid.innerHTML = '<p style="text-align:center; width:100%; opacity:0.5;">No products found in cloud.</p>';
+    }
 
     posts.forEach((p) => {
         const card = document.createElement('div');
@@ -82,7 +100,7 @@ document.getElementById('submit-login').onclick = () => {
     }
 };
 
-// --- 5. ADD POST (CLOUD SYNC) ---
+// --- 5. ADD POST (LAPTOP TO PHONE SYNC) ---
 document.getElementById('add-btn').onclick = async () => {
     const name = document.getElementById('new-name').value;
     const cat = document.getElementById('new-cat').value;
@@ -90,7 +108,7 @@ document.getElementById('add-btn').onclick = async () => {
 
     if (name && cat && file) {
         const btn = document.getElementById('add-btn');
-        btn.innerText = "UPLOADING...";
+        btn.innerText = "CLOUD SYNCING...";
         btn.disabled = true;
 
         const reader = new FileReader();
@@ -100,7 +118,7 @@ document.getElementById('add-btn').onclick = async () => {
             currentPosts.push(newItem);
             
             await saveToCloud(currentPosts);
-            draw();
+            await draw();
             
             btn.innerText = "PUBLISH";
             btn.disabled = false;
@@ -111,7 +129,7 @@ document.getElementById('add-btn').onclick = async () => {
 };
 
 window.removePost = async (id) => {
-    if(confirm("Delete this post everywhere?")) {
+    if(confirm("Delete this everywhere?")) {
         let currentPosts = await loadFromCloud();
         currentPosts = currentPosts.filter(p => p.id !== id);
         await saveToCloud(currentPosts);
@@ -127,5 +145,5 @@ document.getElementById('logout-btn').onclick = () => {
 document.getElementById('open-login-btn').onclick = () => document.getElementById('login-modal').style.display='flex';
 document.getElementById('close-modal').onclick = () => document.getElementById('login-modal').style.display='none';
 
-// Initial Load
+// Load
 draw();
