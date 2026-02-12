@@ -1,0 +1,68 @@
+:root {
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --accent: #f1c40f; 
+    --text-main: #ffffff;
+    --text-dim: #a0a0a0;
+}
+
+body { 
+    font-family: 'Arial Black', Gadget, sans-serif; 
+    background: var(--bg-color); 
+    color: var(--text-main); 
+    margin: 0; 
+    padding-bottom: 50px;
+}
+
+header { 
+    text-align: center; 
+    padding: 3rem 1rem; 
+    background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=800&q=80');
+    background-size: cover;
+    background-position: center;
+    border-bottom: 5px solid var(--accent);
+}
+
+h1 { font-size: 3rem; margin: 0; letter-spacing: -2px; text-transform: uppercase; }
+
+.tagline { color: var(--accent); letter-spacing: 3px; font-weight: bold; }
+
+.container { max-width: 600px; margin: auto; padding: 20px; }
+
+.category-header { 
+    background: var(--accent); 
+    color: black; 
+    padding: 10px 20px; 
+    margin-top: 30px;
+    transform: skew(-10deg);
+    display: inline-block;
+}
+
+.menu-card {
+    background: var(--card-bg);
+    margin: 15px 0;
+    padding: 20px;
+    border-left: 4px solid var(--accent);
+    display: flex;
+    justify-content: space-between;
+    transition: 0.3s;
+}
+
+.menu-card:hover {
+    transform: scale(1.02);
+    background: #252525;
+}
+
+.item-name { font-size: 1.2rem; text-transform: uppercase; margin-bottom: 5px; }
+.item-desc { font-family: 'Helvetica', sans-serif; font-size: 0.9rem; color: var(--text-dim); }
+.item-price { font-size: 1.4rem; color: var(--accent); margin-left: 15px; }
+
+.badge {
+    background: #ff4757;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 3px;
+    vertical-align: middle;
+}
+
