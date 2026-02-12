@@ -29,7 +29,7 @@ nav {
 .container { max-width: 1200px; margin: auto; padding: 40px 20px; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 35px; }
 
-/* REPEAT ANIMATION CSS */
+/* REPEAT ANIMATION */
 .product-card { 
     background: var(--card); border-radius: 15px; overflow: hidden; 
     border: 1px solid #222; position: relative;
