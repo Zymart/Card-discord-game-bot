@@ -2,37 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sixssilicious | Nutritious Bite</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body>
+<body class="loading">
 
     <div id="access-overlay" class="overlay">
         <div class="access-content">
-            <span class="check-icon">✔</span>
+            <div class="checkmark">✔</div>
             <h2>LOGIN ACCEPTED</h2>
-            <p>Welcome back, Team Sixssilicious</p>
         </div>
     </div>
 
     <nav>
         <div class="nav-container">
             <div class="brand">
-                <img src="1000041430.png" alt="SNB Logo" class="nav-logo">
-                <div class="logo-text-group">
-                    <span class="logo-main">SIXSSILICIOUS</span>
-                    <span class="logo-sub">Nutritious Bite</span>
-                </div>
+                <img src="1000041430.png" alt="Logo" class="nav-logo" onerror="this.src='https://via.placeholder.com/50?text=SNB'">
+                <span class="logo-text">SIXSSILICIOUS</span>
             </div>
-            <button id="open-login-btn" class="admin-gear">⚙️</button>
+            <button id="open-login-btn" class="admin-icon-btn">⚙️ Admin Login</button>
         </div>
     </nav>
 
     <header class="hero">
-        <h1>SIMPLE & DELICIOUS NUTRITIOUS BITES</h1>
-        <p>Handcrafted with passion • Unang tikim, lasap mo ang lalim</p>
+        <div class="hero-inner">
+            <p class="top-tag">SIMPLE & DELICIOUS</p>
+            <h1>NUTRITIOUS BITES</h1>
+            <p class="sub-tag">Unang tikim, lasap mo ang lalim</p>
+        </div>
     </header>
 
     <main class="container">
@@ -42,31 +41,26 @@
 
     <div id="login-modal" class="modal">
         <div class="modal-box">
-            <h3>TEAM ACCESS</h3>
+            <h3>ADMIN ACCESS</h3>
             <input type="text" id="user-input" placeholder="Username">
             <input type="password" id="pass-input" placeholder="Password">
-            <div class="modal-btns">
-                <button id="submit-login">LOGIN</button>
-                <button id="close-modal" class="cancel-btn">CLOSE</button>
-            </div>
+            <button id="submit-login">UNLOCK PANEL</button>
+            <button id="close-modal" class="cancel-link">Back to Website</button>
             <p id="error-msg" class="error">Access Denied</p>
         </div>
     </div>
 
     <div id="admin-panel" class="admin-panel">
         <div class="admin-container">
-            <p class="panel-label">ADMIN CONTROL PANEL</p>
-            <div class="admin-inputs">
-                <input type="text" id="new-name" placeholder="Post Title">
-                <input type="text" id="new-cat" placeholder="Category">
+            <div class="admin-controls">
+                <input type="text" id="new-name" placeholder="Item Name">
+                <input type="text" id="new-cat" placeholder="Category (e.g. DINNER)">
                 <label class="file-label">
-                    📷 Upload Photo
+                    <span>📷 Upload Photo</span>
                     <input type="file" id="new-image-file" accept="image/*">
                 </label>
-                <div class="admin-actions">
-                    <button id="add-btn">POST TO WEBSITE</button>
-                    <button id="logout-btn">LOGOUT</button>
-                </div>
+                <button id="add-btn">POST PRODUCT</button>
+                <button id="logout-btn" class="logout">LOGOUT</button>
             </div>
         </div>
     </div>
