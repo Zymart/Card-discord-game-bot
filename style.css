@@ -1,79 +1,88 @@
 :root {
-    --primary-green: #2e7d32;
-    --logo-yellow: #f1c40f;
-    --bg-texture: #fdfcf9;
-    --card-shadow: 0 12px 24px rgba(0,0,0,0.08);
+    --snb-green: #2e7d32;
+    --snb-cream: #f9f7f2;
+    --snb-dark: #1a1a1a;
 }
 
 body { 
     margin: 0; 
     font-family: 'Montserrat', sans-serif; 
-    background-color: var(--bg-texture);
-    background-image: url('https://www.transparenttextures.com/patterns/cubes.png'); /* Subtle texture */
-    color: #333; 
+    background-color: var(--snb-cream);
+    color: var(--snb-dark);
+    -webkit-font-smoothing: antialiased;
 }
 
-/* Nav Bar */
-nav { background: white; padding: 10px 0; border-bottom: 4px solid var(--primary-green); position: sticky; top: 0; z-index: 1000; }
-.nav-container { max-width: 1200px; margin: auto; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-.brand { display: flex; align-items: center; gap: 10px; }
-.nav-logo { height: 60px; width: auto; }
-.logo-text { font-weight: 900; letter-spacing: 2px; color: var(--primary-green); font-size: 1.4rem; }
+/* Navbar Fix */
+nav { 
+    background: #fff; 
+    padding: 10px 15px; 
+    border-bottom: 3px solid var(--snb-green); 
+    position: sticky; 
+    top: 0; 
+    z-index: 1000;
+}
+.nav-container { 
+    max-width: 1200px; 
+    margin: auto; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+}
+.brand { display: flex; align-items: center; gap: 12px; }
+.nav-logo { height: 50px; width: auto; border-radius: 50%; }
+.logo-main { display: block; font-weight: 900; color: var(--snb-green); font-size: 1.1rem; }
+.logo-sub { font-size: 0.7rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
 
-/* Hero Section */
-.hero { text-align: center; padding: 80px 20px; background: rgba(255,255,255,0.5); }
-.hero h1 { font-size: clamp(1.8rem, 5vw, 2.5rem); font-weight: 900; margin: 0; letter-spacing: 1px; }
-.hero p { color: #666; font-size: 1.1rem; margin-top: 10px; font-style: italic; }
+/* Hero */
+.hero { text-align: center; padding: 50px 20px; background: #fff; margin-bottom: 20px; }
+.hero h1 { font-size: 1.8rem; font-weight: 900; margin: 0; line-height: 1.2; }
+.hero p { font-size: 0.9rem; color: #777; margin-top: 10px; }
 
-/* The Grid */
-.container { max-width: 1200px; margin: auto; padding: 20px; }
+/* Product Grid */
+.container { max-width: 1200px; margin: auto; padding: 15px; }
 .grid { 
     display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
-    gap: 40px; 
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 25px; 
 }
 
-/* Post Cards */
+/* Cards */
 .product-card { 
-    position: relative; background: white; border-radius: 0; overflow: hidden; 
-    box-shadow: var(--card-shadow); transition: transform 0.3s;
+    background: #fff; 
+    border-radius: 12px; 
+    overflow: hidden; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06); 
+    position: relative;
 }
-.product-card:hover { transform: translateY(-5px); }
-.product-card img { width: 100%; height: 300px; object-fit: cover; }
+.product-card img { width: 100%; height: 250px; object-fit: cover; }
+.card-content { padding: 20px; text-align: center; }
+.category { color: var(--snb-green); font-weight: 700; font-size: 0.75rem; text-transform: uppercase; }
+.product-card h3 { margin: 10px 0; font-size: 1.2rem; }
 
-.card-content { padding: 30px 20px; text-align: center; border-top: 1px solid #eee; }
-.category { color: var(--primary-green); font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px; }
-.card-content h3 { margin: 0; font-size: 1.4rem; line-height: 1.3; }
-
-/* Admin UI */
-.admin-mode .del-btn { display: block !important; }
+/* Admin UI Logic */
+.admin-mode .del-btn { display: flex !important; }
 .del-btn { 
-    display: none; position: absolute; top: 15px; right: 15px; background: #ff4757; color: white; 
-    border: none; width: 40px; height: 40px; border-radius: 50%; font-size: 20px; cursor: pointer; z-index: 10;
+    display: none; position: absolute; top: 10px; right: 10px; 
+    background: #ff4757; color: #fff; border: none; width: 35px; height: 35px; 
+    border-radius: 50%; justify-content: center; align-items: center; cursor: pointer; font-weight: bold;
 }
 
 .admin-panel { 
-    display: none; background: #222; color: white; padding: 20px; 
-    position: fixed; bottom: 0; width: 100%; z-index: 2000; border-top: 5px solid var(--logo-yellow); 
-}
-.panel-header { text-align: center; font-weight: 900; margin-bottom: 15px; color: var(--logo-yellow); }
-.admin-inputs { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-
-/* Success Overlay */
-.overlay {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--primary-green); color: white; z-index: 5000; justify-content: center; align-items: center; text-align: center;
+    display: none; position: fixed; bottom: 0; width: 100%; background: #1a1a1a; 
+    color: #fff; padding: 20px; z-index: 2000; border-top: 5px solid var(--snb-green);
+    box-sizing: border-box;
 }
 
-/* Buttons & Forms */
-button { cursor: pointer; border: none; font-weight: bold; transition: 0.2s; }
-.admin-icon-btn { background: var(--bg-texture); border: 1px solid #ddd; padding: 10px 20px; border-radius: 30px; }
-#submit-login, #add-btn { background: var(--primary-green); color: white; padding: 12px 25px; }
-.file-upload { background: #444; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 0.9rem; }
-input { padding: 12px; border: 1px solid #ddd; }
+/* Overlays */
+.overlay { 
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: var(--snb-green); color: #fff; z-index: 9999; 
+    justify-content: center; align-items: center; text-align: center; 
+}
 
-/* Mobile View */
+/* Mobile Optimizations */
 @media (max-width: 600px) {
     .grid { grid-template-columns: 1fr; }
-    .hero h1 { font-size: 1.8rem; }
+    .hero h1 { font-size: 1.5rem; }
+    .admin-inputs { display: flex; flex-direction: column; }
 }
