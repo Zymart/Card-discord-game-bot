@@ -1,41 +1,38 @@
 const BIN_ID = '698dbb6d43b1c97be9795688';
 const API_KEY = '$2a$10$McXg3fOwbLYW3Sskgfroj.nzMjtwwubDEz08zXpBN32KQ.8MvCJgK';
-const grid = document.getElementById('product-grid');
+const foodGrid = document.getElementById('food-grid');
+const drinksGrid = document.getElementById('drinks-grid');
 const adminDock = document.getElementById('admin-panel');
 
-// --- 1. CLOUD SYNC (FORCE SYNC TO "recipes" KEY) ---
+// --- 1. CLOUD SYNC ---
 async function loadFromCloud() {
     try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, {
             headers: { 'X-Master-Key': API_KEY }
         });
         const data = await res.json();
-        // Extracting directly from the key shown in your bin screenshot
         return data.recipes || [];
     } catch (err) {
-        console.error("Cloud Error:", err);
+        console.error("Fetch Error:", err);
         return [];
     }
 }
 
 async function saveToCloud(dataArray) {
     try {
-        const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+        await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
             body: JSON.stringify({ "recipes": dataArray })
         });
-        if (res.ok) {
-            console.log("SYNC SUCCESSFUL");
-            return true;
-        }
+        return true;
     } catch (err) {
-        alert("SYNC FAILED: Check your internet connection.");
+        console.error("Save Error:", err);
         return false;
     }
 }
 
-// --- 2. REPEAT ANIMATION OBSERVER ---
+// --- 2. REPEAT ANIMATION ---
 const scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -46,11 +43,15 @@ const scrollObserver = new IntersectionObserver((entries) => {
     });
 }, { threshold: 0.1 });
 
-// --- 3. RENDERING ---
+// --- 3. RENDERING (BY CATEGORY) ---
 async function draw() {
-    grid.innerHTML = '<p style="color:var(--accent); text-align:center; width:100%;">Connecting to Cloud...</p>';
+    foodGrid.innerHTML = '<p style="color:var(--accent);">Syncing Food...</p>';
+    drinksGrid.innerHTML = '<p style="color:var(--accent);">Syncing Drinks...</p>';
+    
     const posts = await loadFromCloud();
-    grid.innerHTML = '';
+    
+    foodGrid.innerHTML = '';
+    drinksGrid.innerHTML = '';
 
     posts.forEach((p) => {
         const card = document.createElement('div');
@@ -64,12 +65,19 @@ async function draw() {
                 <div style="color:var(--accent);">⭐⭐⭐⭐⭐</div>
             </div>
         `;
-        grid.appendChild(card);
+
+        // SORTING LOGIC
+        if (p.cat === "Food") {
+            foodGrid.appendChild(card);
+        } else {
+            drinksGrid.appendChild(card);
+        }
+        
         scrollObserver.observe(card);
     });
 }
 
-// --- 4. ADMIN LOGIN ---
+// --- 4. AUTH ---
 if (localStorage.getItem('snb_auth') === 'true') {
     adminDock.style.display = 'block';
     document.getElementById('open-login-btn').style.display = 'none';
@@ -89,7 +97,7 @@ document.getElementById('submit-login').onclick = () => {
     }
 };
 
-// --- 5. ADD PRODUCT (SYNC LAPTOP TO PHONE) ---
+// --- 5. ADD PRODUCT ---
 document.getElementById('add-btn').onclick = async () => {
     const name = document.getElementById('new-name').value;
     const cat = document.getElementById('new-cat').value;
@@ -106,8 +114,7 @@ document.getElementById('add-btn').onclick = async () => {
             const newItem = { id: Date.now().toString(), name, cat, img: e.target.result };
             currentPosts.push(newItem);
             
-            const success = await saveToCloud(currentPosts);
-            if(success) {
+            if (await saveToCloud(currentPosts)) {
                 await draw();
                 document.getElementById('new-name').value = '';
             }
