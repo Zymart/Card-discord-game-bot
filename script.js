@@ -43,15 +43,12 @@ const scrollObserver = new IntersectionObserver((entries) => {
     });
 }, { threshold: 0.1 });
 
-// --- 3. RENDERING (BY CATEGORY) ---
+// --- 3. RENDERING ---
 async function draw() {
-    foodGrid.innerHTML = '<p style="color:var(--accent);">Syncing Food...</p>';
-    drinksGrid.innerHTML = '<p style="color:var(--accent);">Syncing Drinks...</p>';
-    
-    const posts = await loadFromCloud();
-    
     foodGrid.innerHTML = '';
     drinksGrid.innerHTML = '';
+    
+    const posts = await loadFromCloud();
 
     posts.forEach((p) => {
         const card = document.createElement('div');
@@ -60,13 +57,12 @@ async function draw() {
             <button class="del-btn" onclick="removePost('${p.id}')">×</button>
             <img src="${p.img}">
             <div class="card-content">
-                <span style="color:var(--accent); font-weight:700;">${p.cat}</span>
-                <h3>${p.name}</h3>
-                <div style="color:var(--accent);">⭐⭐⭐⭐⭐</div>
+                <span style="color:var(--accent); font-weight:700; font-size:0.7rem;">${p.cat}</span>
+                <h3 style="margin:5px 0;">${p.name}</h3>
+                <span class="price-tag">₱${p.price || '0'}</span>
             </div>
         `;
 
-        // SORTING LOGIC
         if (p.cat === "Food") {
             foodGrid.appendChild(card);
         } else {
@@ -97,13 +93,14 @@ document.getElementById('submit-login').onclick = () => {
     }
 };
 
-// --- 5. ADD PRODUCT ---
+// --- 5. ADD PRODUCT WITH PRICE ---
 document.getElementById('add-btn').onclick = async () => {
     const name = document.getElementById('new-name').value;
+    const price = document.getElementById('new-price').value;
     const cat = document.getElementById('new-cat').value;
     const file = document.getElementById('new-image-file').files[0];
 
-    if (name && cat && file) {
+    if (name && price && cat && file) {
         const btn = document.getElementById('add-btn');
         btn.innerText = "SYNCING...";
         btn.disabled = true;
@@ -111,17 +108,26 @@ document.getElementById('add-btn').onclick = async () => {
         const reader = new FileReader();
         reader.onload = async (e) => {
             let currentPosts = await loadFromCloud();
-            const newItem = { id: Date.now().toString(), name, cat, img: e.target.result };
+            const newItem = { 
+                id: Date.now().toString(), 
+                name, 
+                price, // Saving the price
+                cat, 
+                img: e.target.result 
+            };
             currentPosts.push(newItem);
             
             if (await saveToCloud(currentPosts)) {
                 await draw();
                 document.getElementById('new-name').value = '';
+                document.getElementById('new-price').value = '';
             }
             btn.innerText = "PUBLISH";
             btn.disabled = false;
         };
         reader.readAsDataURL(file);
+    } else {
+        alert("Please fill in all fields (Name, Price, Category, and Image)");
     }
 };
 
