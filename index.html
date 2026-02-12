@@ -16,46 +16,18 @@
                 <li>HOME</li>
                 <li>PRODUCTS</li>
                 <li>DRINKS</li>
-                <li>ABOUT</li>
             </ul>
             <button id="open-login-btn" class="admin-icon-btn">⚙️ Admin Login</button>
         </div>
     </nav>
 
     <header class="hero">
-        <h1>BOLD & FLAVORFUL CREATIONS</h1>
+        <h1>SIXSSILICIOUS</h1>
         <p>Handcrafted with passion</p>
     </header>
 
     <main class="container">
-        <div id="product-grid" class="grid">
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500" alt="Burger">
-                <div class="card-content">
-                    <span class="category">Sandwiches & More</span>
-                    <h3>Spicy Pulled Pork Burger</h3>
-                    <div class="rating">⭐⭐⭐⭐ 4.8</div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=500" alt="Tacos">
-                <div class="card-content">
-                    <span class="category">Asian Fusion</span>
-                    <h3>Korean BBQ Tacos</h3>
-                    <div class="rating">⭐⭐⭐⭐ 4.8</div>
-                </div>
-            </div>
-
-            <div class="product-card">
-                <img src="https://images.unsplash.com/photo-1513558161293-cdaf76589fd8?w=500" alt="Drink">
-                <div class="card-content">
-                    <span class="category">Signature Drinks</span>
-                    <h3>Mango Chili Limeade</h3>
-                    <div class="rating">⭐⭐⭐⭐⭐ 5.1</div>
-                </div>
-            </div>
-        </div>
+        <div id="product-grid" class="grid"></div>
     </main>
 
     <div id="login-modal" class="modal">
@@ -64,18 +36,19 @@
             <input type="text" id="user-input" placeholder="Username">
             <input type="password" id="pass-input" placeholder="Password">
             <button id="submit-login">Login</button>
-            <p id="error-msg" class="error">Access Denied</p>
+            <button id="close-modal" class="cancel-link">Cancel</button>
+            <p id="error-msg" class="error">Access Denied: Check Name/Pass</p>
         </div>
     </div>
 
-    <div id="admin-panel" class="admin-panel" style="display:none;">
+    <div id="admin-panel" class="admin-panel">
         <div class="admin-container">
-            <h3>Add New Creation</h3>
-            <input type="text" id="new-name" placeholder="Product Name">
+            <h3>Admin Tools:</h3>
+            <input type="text" id="new-name" placeholder="Food Name">
             <input type="text" id="new-cat" placeholder="Category">
-            <input type="text" id="new-img" placeholder="Image Link (URL)">
-            <button id="add-btn">Add to Website</button>
-            <button onclick="location.reload()" class="logout">Logout</button>
+            <input type="text" id="new-img" placeholder="Image URL">
+            <button id="add-btn">Post Product</button>
+            <button id="logout-btn" class="logout">Logout</button>
         </div>
     </div>
 
