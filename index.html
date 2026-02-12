@@ -3,11 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sixssilicious | Handcrafted</title>
+    <title>Sixssilicious | Admin Panel</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
+
+    <div id="access-overlay" class="overlay">
+        <div class="access-content">
+            <div class="checkmark">✔</div>
+            <h2>LOGIN ACCEPTED</h2>
+            <p>Welcome back, Team Sixssilicious</p>
+        </div>
+    </div>
 
     <nav>
         <div class="nav-container">
@@ -22,8 +30,7 @@
     </header>
 
     <main class="container">
-        <div id="product-grid" class="grid">
-            </div>
+        <div id="product-grid" class="grid"></div>
     </main>
 
     <div id="login-modal" class="modal">
@@ -40,14 +47,16 @@
     <div id="admin-panel" class="admin-panel">
         <div class="admin-container">
             <h3>New Post:</h3>
-            <input type="text" id="new-name" placeholder="Item Name">
-            <input type="text" id="new-cat" placeholder="Category">
-            <label class="file-upload">
-                📷 Upload Image
-                <input type="file" id="new-image-file" accept="image/*">
-            </label>
-            <button id="add-btn">Post to Website</button>
-            <button id="logout-btn" class="logout">Logout</button>
+            <div class="admin-inputs">
+                <input type="text" id="new-name" placeholder="Item Name">
+                <input type="text" id="new-cat" placeholder="Category">
+                <label class="file-upload">
+                    📷 Upload Image
+                    <input type="file" id="new-image-file" accept="image/*">
+                </label>
+                <button id="add-btn">Post to Website</button>
+                <button id="logout-btn" class="logout">Logout</button>
+            </div>
         </div>
     </div>
 
