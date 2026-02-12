@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sixssilicious | Nutritious Bite</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
 
     <div id="access-overlay" class="overlay">
         <div class="access-content">
-            <div class="checkmark">✔</div>
+            <span class="check-icon">✔</span>
             <h2>LOGIN ACCEPTED</h2>
             <p>Welcome back, Team Sixssilicious</p>
         </div>
@@ -21,17 +21,18 @@
         <div class="nav-container">
             <div class="brand">
                 <img src="1000041430.png" alt="SNB Logo" class="nav-logo">
-                <span class="logo-text">SIXSSILICIOUS</span>
+                <div class="logo-text-group">
+                    <span class="logo-main">SIXSSILICIOUS</span>
+                    <span class="logo-sub">Nutritious Bite</span>
+                </div>
             </div>
-            <button id="open-login-btn" class="admin-icon-btn">⚙️ Admin</button>
+            <button id="open-login-btn" class="admin-gear">⚙️</button>
         </div>
     </nav>
 
     <header class="hero">
-        <div class="hero-content">
-            <h1>SIMPLE & DELICIOUS NUTRITIOUS BITES</h1>
-            <p>Handcrafted with passion • Unang tikim, lasap mo ang lalim</p>
-        </div>
+        <h1>SIMPLE & DELICIOUS NUTRITIOUS BITES</h1>
+        <p>Handcrafted with passion • Unang tikim, lasap mo ang lalim</p>
     </header>
 
     <main class="container">
@@ -44,24 +45,28 @@
             <h3>TEAM ACCESS</h3>
             <input type="text" id="user-input" placeholder="Username">
             <input type="password" id="pass-input" placeholder="Password">
-            <button id="submit-login">Login</button>
-            <button id="close-modal" class="cancel-link">Cancel</button>
+            <div class="modal-btns">
+                <button id="submit-login">LOGIN</button>
+                <button id="close-modal" class="cancel-btn">CLOSE</button>
+            </div>
             <p id="error-msg" class="error">Access Denied</p>
         </div>
     </div>
 
     <div id="admin-panel" class="admin-panel">
         <div class="admin-container">
-            <div class="panel-header">ADMIN CONTROL PANEL</div>
+            <p class="panel-label">ADMIN CONTROL PANEL</p>
             <div class="admin-inputs">
-                <input type="text" id="new-name" placeholder="Post Title (e.g. Vegan Mushroom)">
-                <input type="text" id="new-cat" placeholder="Category (e.g. ONE POT)">
-                <label class="file-upload">
-                    📷 Upload Food Photo
+                <input type="text" id="new-name" placeholder="Post Title">
+                <input type="text" id="new-cat" placeholder="Category">
+                <label class="file-label">
+                    📷 Upload Photo
                     <input type="file" id="new-image-file" accept="image/*">
                 </label>
-                <button id="add-btn">POST TO WEBSITE</button>
-                <button id="logout-btn" class="logout">LOGOUT</button>
+                <div class="admin-actions">
+                    <button id="add-btn">POST TO WEBSITE</button>
+                    <button id="logout-btn">LOGOUT</button>
+                </div>
             </div>
         </div>
     </div>
