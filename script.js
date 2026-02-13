@@ -1,7 +1,7 @@
 const BIN_ID = '698dbb6d43b1c97be9795688';
 const API_KEY = '$2a$10$McXg3fOwbLYW3Sskgfroj.nzMjtwwubDEz08zXpBN32KQ.8MvCJgK';
 
-// UTILITIES
+// NOTIFICATIONS
 function showNotify(msg, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -12,24 +12,26 @@ function showNotify(msg, type = 'success') {
     setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
 }
 
+// IMAGE OPTIMIZER (CRITICAL FIX)
 async function optimizeImage(base64Str) {
     return new Promise((resolve) => {
         const img = new Image();
         img.src = base64Str;
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const MAX_W = 400; 
+            const MAX_W = 400; // Small but effective
             const scale = MAX_W / img.width;
             canvas.width = MAX_W;
             canvas.height = img.height * scale;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            // 0.4 quality significantly reduces string size for JSONBin
             resolve(canvas.toDataURL('image/jpeg', 0.4));
         };
     });
 }
 
-// API CALLS
+// CLOUD STORAGE
 async function loadCloud() {
     try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, { headers: { 'X-Master-Key': API_KEY } });
@@ -49,7 +51,7 @@ async function saveCloud(data) {
     } catch (e) { return false; }
 }
 
-// RENDERING
+// ANIMATION OBSERVER
 let scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry, idx) => {
         if (entry.isIntersecting) {
@@ -58,6 +60,7 @@ let scrollObserver = new IntersectionObserver((entries) => {
     });
 }, { threshold: 0.1 });
 
+// MAIN RENDER
 async function render() {
     const items = await loadCloud();
     const grid = document.getElementById('product-grid');
@@ -71,8 +74,8 @@ async function render() {
             <button class="del-btn" onclick="deleteItem('${item.id}')">×</button>
             <img src="${item.img}">
             <div class="card-content">
-                <small style="color:var(--accent)">${item.cat || 'ITEM'}</small>
-                <h3>${item.name}</h3>
+                <small style="color:var(--accent); font-weight:bold;">${item.cat || 'MENU'}</small>
+                <h3 style="margin:5px 0;">${item.name}</h3>
                 <div class="price-display">₱${item.price}</div>
             </div>
         `;
@@ -81,7 +84,7 @@ async function render() {
     });
 }
 
-// ACTIONS
+// UI LOGIC
 document.getElementById('open-product-modal').onclick = () => document.getElementById('product-modal').style.display = 'flex';
 document.getElementById('close-product-modal').onclick = () => document.getElementById('product-modal').style.display = 'none';
 document.getElementById('open-login-btn').onclick = () => document.getElementById('login-modal').style.display = 'flex';
@@ -93,7 +96,7 @@ document.getElementById('add-btn').onclick = async () => {
     const cat = document.getElementById('new-cat').value;
     const file = document.getElementById('new-image-file').files[0];
 
-    if (!name || !price || !file) return showNotify("Please fill all fields", "error");
+    if (!name || !price || !file) return showNotify("Fill all fields!", "error");
 
     document.getElementById('add-btn').innerText = "PUBLISHING...";
     const reader = new FileReader();
@@ -104,7 +107,7 @@ document.getElementById('add-btn').onclick = async () => {
         if (await saveCloud(list)) {
             location.reload();
         } else {
-            showNotify("Storage Error!", "error");
+            showNotify("Upload failed. Try a smaller photo.", "error");
             document.getElementById('add-btn').innerText = "PUBLISH ITEM";
         }
     };
@@ -112,19 +115,19 @@ document.getElementById('add-btn').onclick = async () => {
 };
 
 window.deleteItem = async (id) => {
-    if(!confirm("Delete this?")) return;
+    if(!confirm("Delete this product?")) return;
     let list = await loadCloud();
     list = list.filter(i => i.id !== id);
     if(await saveCloud(list)) render();
 };
 
 document.getElementById('wipe-btn').onclick = async () => {
-    if(confirm("Wipe everything?")) {
+    if(confirm("DANGER: This will delete everything! Proceed?")) {
         if(await saveCloud([])) location.reload();
     }
 };
 
-// AUTH
+// AUTHENTICATION
 if (localStorage.getItem('snb_auth') === 'true') {
     document.getElementById('admin-panel').style.display = 'block';
     document.getElementById('open-product-modal').style.display = 'block';
