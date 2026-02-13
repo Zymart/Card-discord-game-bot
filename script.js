@@ -1,37 +1,32 @@
 const BIN_ID = '698dbb6d43b1c97be9795688';
 const API_KEY = '$2a$10$McXg3fOwbLYW3Sskgfroj.nzMjtwwubDEz08zXpBN32KQ.8MvCJgK';
 
-// NOTIFICATIONS
-function showNotify(msg, type = 'success') {
-    const container = document.getElementById('toast-container');
-    const toast = document.createElement('div');
-    toast.className = 'toast';
-    toast.style.borderLeftColor = type === 'error' ? 'var(--danger)' : 'var(--accent)';
-    toast.innerHTML = `<span>${msg}</span>`;
-    container.appendChild(toast);
-    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
-}
-
-// IMAGE OPTIMIZER (CRITICAL FIX)
-async function optimizeImage(base64Str) {
+// FIXED IMAGE HANDLING: This shrinks ANY photo so it fits the database
+async function processAnyImage(file) {
     return new Promise((resolve) => {
-        const img = new Image();
-        img.src = base64Str;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            const MAX_W = 400; // Small but effective
-            const scale = MAX_W / img.width;
-            canvas.width = MAX_W;
-            canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            // 0.4 quality significantly reduces string size for JSONBin
-            resolve(canvas.toDataURL('image/jpeg', 0.4));
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                // We force the image to a standard size so it ALWAYS saves
+                const width = 500;
+                const scale = width / img.width;
+                canvas.width = width;
+                canvas.height = img.height * scale;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Convert to very efficient JPEG string
+                resolve(canvas.toDataURL('image/jpeg', 0.5)); 
+            };
         };
     });
 }
 
-// CLOUD STORAGE
 async function loadCloud() {
     try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, { headers: { 'X-Master-Key': API_KEY } });
@@ -51,7 +46,6 @@ async function saveCloud(data) {
     } catch (e) { return false; }
 }
 
-// ANIMATION OBSERVER
 let scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry, idx) => {
         if (entry.isIntersecting) {
@@ -60,7 +54,6 @@ let scrollObserver = new IntersectionObserver((entries) => {
     });
 }, { threshold: 0.1 });
 
-// MAIN RENDER
 async function render() {
     const items = await loadCloud();
     const grid = document.getElementById('product-grid');
@@ -74,8 +67,8 @@ async function render() {
             <button class="del-btn" onclick="deleteItem('${item.id}')">×</button>
             <img src="${item.img}">
             <div class="card-content">
-                <small style="color:var(--accent); font-weight:bold;">${item.cat || 'MENU'}</small>
-                <h3 style="margin:5px 0;">${item.name}</h3>
+                <small style="color:var(--accent)">${item.cat || 'MENU'}</small>
+                <h3>${item.name}</h3>
                 <div class="price-display">₱${item.price}</div>
             </div>
         `;
@@ -84,7 +77,7 @@ async function render() {
     });
 }
 
-// UI LOGIC
+// UI EVENTS
 document.getElementById('open-product-modal').onclick = () => document.getElementById('product-modal').style.display = 'flex';
 document.getElementById('close-product-modal').onclick = () => document.getElementById('product-modal').style.display = 'none';
 document.getElementById('open-login-btn').onclick = () => document.getElementById('login-modal').style.display = 'flex';
@@ -96,38 +89,41 @@ document.getElementById('add-btn').onclick = async () => {
     const cat = document.getElementById('new-cat').value;
     const file = document.getElementById('new-image-file').files[0];
 
-    if (!name || !price || !file) return showNotify("Fill all fields!", "error");
+    if (!name || !price || !file) return alert("Complete all info first.");
 
-    document.getElementById('add-btn').innerText = "PUBLISHING...";
-    const reader = new FileReader();
-    reader.onload = async (e) => {
-        const smallImg = await optimizeImage(e.target.result);
-        let list = await loadCloud();
-        list.push({ id: Date.now().toString(), name, price, cat, img: smallImg });
-        if (await saveCloud(list)) {
-            location.reload();
-        } else {
-            showNotify("Upload failed. Try a smaller photo.", "error");
-            document.getElementById('add-btn').innerText = "PUBLISH ITEM";
-        }
-    };
-    reader.readAsDataURL(file);
+    const btn = document.getElementById('add-btn');
+    btn.innerText = "PUBLISHING...";
+    btn.disabled = true;
+
+    // Process the image regardless of its original size
+    const optimizedBase64 = await processAnyImage(file);
+    
+    let list = await loadCloud();
+    list.push({ id: Date.now().toString(), name, price, cat, img: optimizedBase64 });
+
+    if (await saveCloud(list)) {
+        location.reload();
+    } else {
+        alert("Critical Error: Database rejected the data. Try wiping storage.");
+        btn.innerText = "PUBLISH ITEM";
+        btn.disabled = false;
+    }
 };
 
 window.deleteItem = async (id) => {
-    if(!confirm("Delete this product?")) return;
+    if(!confirm("Delete this?")) return;
     let list = await loadCloud();
     list = list.filter(i => i.id !== id);
     if(await saveCloud(list)) render();
 };
 
 document.getElementById('wipe-btn').onclick = async () => {
-    if(confirm("DANGER: This will delete everything! Proceed?")) {
+    if(confirm("Wipe all data?")) {
         if(await saveCloud([])) location.reload();
     }
 };
 
-// AUTHENTICATION
+// LOGIN
 if (localStorage.getItem('snb_auth') === 'true') {
     document.getElementById('admin-panel').style.display = 'block';
     document.getElementById('open-product-modal').style.display = 'block';
@@ -141,7 +137,7 @@ document.getElementById('submit-login').onclick = () => {
     if (["Zymart", "Brigette", "Lance", "Taduran"].includes(u) && p === "sixssiliciousteam") {
         localStorage.setItem('snb_auth', 'true');
         location.reload();
-    } else { showNotify("Access Denied", "error"); }
+    } else { alert("Wrong Login"); }
 };
 
 document.getElementById('logout-btn').onclick = () => { localStorage.clear(); location.reload(); };
