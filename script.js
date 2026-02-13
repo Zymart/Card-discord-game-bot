@@ -1,82 +1,136 @@
 const BIN_ID = '698dbb6d43b1c97be9795688';
 const API_KEY = '$2a$10$McXg3fOwbLYW3Sskgfroj.nzMjtwwubDEz08zXpBN32KQ.8MvCJgK';
-const productGrid = document.getElementById('product-grid');
 
-// Animation Logic
-const createObserver = () => {
-    return new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) entry.target.classList.add('is-visible');
-        });
-    }, { threshold: 0.15 });
-};
-let scrollObserver = createObserver();
+// 1. SMART NOTIFICATION SYSTEM
+function showNotify(msg, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type === 'error' ? 'error' : ''}`;
+    const icon = type === 'error' ? 'fa-circle-xmark' : 'fa-circle-check';
+    
+    toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${msg}</span>`;
+    container.appendChild(toast);
 
-// IMAGE COMPRESSOR (The Fix for any photo size)
-async function compressImage(base64Str) {
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 500);
+    }, 4000);
+}
+
+// 2. IMAGE OPTIMIZER (Maximum Space Saving)
+async function optimizeImage(base64Str) {
     return new Promise((resolve) => {
         const img = new Image();
         img.src = base64Str;
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 800; // Limits resolution for cloud storage
-            const scale = MAX_WIDTH / img.width;
-            canvas.width = MAX_WIDTH;
+            const MAX_W = 600; // Aggressive resize to fit more products
+            const scale = MAX_W / img.width;
+            canvas.width = MAX_W;
             canvas.height = img.height * scale;
-
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            // Returns a compressed version (0.7 quality)
-            resolve(canvas.toDataURL('image/jpeg', 0.7));
+            resolve(canvas.toDataURL('image/jpeg', 0.6)); // Lower quality = way more storage
         };
     });
 }
 
-async function loadFromCloud() {
+// 3. CLOUD LOGIC
+async function loadCloud() {
     try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, {
             headers: { 'X-Master-Key': API_KEY }
         });
         const data = await res.json();
         return data.recipes || [];
-    } catch (err) { return []; }
+    } catch (e) { return []; }
 }
 
-async function saveToCloud(dataArray) {
+async function saveCloud(data) {
     try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
-            body: JSON.stringify({ "recipes": dataArray })
+            body: JSON.stringify({ "recipes": data })
         });
         return res.ok;
-    } catch (err) { return false; }
+    } catch (e) { return false; }
 }
 
-async function draw() {
-    const posts = await loadFromCloud();
-    productGrid.innerHTML = '';
-    scrollObserver.disconnect();
-    scrollObserver = createObserver();
+// 4. DRAWING & ANIMATION
+const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('is-visible');
+    });
+}, { threshold: 0.1 });
 
-    posts.forEach((p) => {
+async function render() {
+    const items = await loadCloud();
+    const grid = document.getElementById('product-grid');
+    grid.innerHTML = '';
+    
+    items.forEach(item => {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-            <button class="del-btn" onclick="removePost('${p.id}')">×</button>
-            <img src="${p.img}">
+            <button class="del-btn" onclick="deleteItem('${item.id}')">×</button>
+            <img src="${item.img}">
             <div class="card-content">
-                <span class="cat-label">${p.cat}</span>
-                <h3 style="margin:5px 0;">${p.name}</h3>
-                <span class="price-display">₱${p.price || '0'}</span>
+                <span class="cat-label">${item.cat}</span>
+                <h3 style="margin:5px 0;">${item.name}</h3>
+                <span class="price-display">₱${item.price}</span>
             </div>
         `;
-        productGrid.appendChild(card);
+        grid.appendChild(card);
         scrollObserver.observe(card);
     });
 }
 
-// LOGIN
+// 5. ADMIN ACTIONS
+document.getElementById('add-btn').onclick = async () => {
+    const name = document.getElementById('new-name').value;
+    const price = document.getElementById('new-price').value;
+    const cat = document.getElementById('new-cat').value;
+    const file = document.getElementById('new-image-file').files[0];
+
+    if (!name || !price || !file) {
+        showNotify("Please complete the form", "error");
+        return;
+    }
+
+    const btn = document.getElementById('add-btn');
+    btn.innerText = "UPLOADING..."; btn.disabled = true;
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        const smallImg = await optimizeImage(e.target.result);
+        let list = await loadCloud();
+        list.push({ id: Date.now().toString(), name, price, cat, img: smallImg });
+
+        if (await saveCloud(list)) {
+            showNotify(`Success! ${name} is live.`);
+            document.getElementById('new-name').value = '';
+            document.getElementById('new-price').value = '';
+            render();
+        } else {
+            showNotify("Cloud is full! Delete old items.", "error");
+        }
+        btn.innerText = "PUBLISH"; btn.disabled = false;
+    };
+    reader.readAsDataURL(file);
+};
+
+window.deleteItem = async (id) => {
+    if(!confirm("Are you sure?")) return;
+    let list = await loadCloud();
+    list = list.filter(i => i.id !== id);
+    if(await saveCloud(list)) {
+        showNotify("Item removed.");
+        render();
+    }
+};
+
+// 6. INITIALIZE
 if (localStorage.getItem('snb_auth') === 'true') {
     document.getElementById('admin-panel').style.display = 'block';
     document.body.classList.add('admin-mode');
@@ -84,56 +138,13 @@ if (localStorage.getItem('snb_auth') === 'true') {
 }
 
 document.getElementById('submit-login').onclick = () => {
-    const user = document.getElementById('user-input').value;
-    const pass = document.getElementById('pass-input').value;
-    if (["Zymart", "Brigette", "Lance", "Taduran"].includes(user) && pass === "sixssiliciousteam") {
+    const u = document.getElementById('user-input').value;
+    const p = document.getElementById('pass-input').value;
+    if (["Zymart", "Brigette", "Lance", "Taduran"].includes(u) && p === "sixssiliciousteam") {
         localStorage.setItem('snb_auth', 'true');
         location.reload();
     } else {
-        document.getElementById('error-msg').style.display = 'block';
-    }
-};
-
-// ADD PRODUCT WITH COMPRESSION
-document.getElementById('add-btn').onclick = async () => {
-    const name = document.getElementById('new-name').value;
-    const price = document.getElementById('new-price').value;
-    const cat = document.getElementById('new-cat').value;
-    const file = document.getElementById('new-image-file').files[0];
-
-    if (name && price && cat && file) {
-        const btn = document.getElementById('add-btn');
-        btn.innerText = "OPTIMIZING..."; btn.disabled = true;
-
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            // COMPRESS BEFORE SAVING
-            const compressedImg = await compressImage(e.target.result);
-            
-            const current = await loadFromCloud();
-            current.push({ id: Date.now().toString(), name, price, cat, img: compressedImg });
-            
-            if (await saveToCloud(current)) {
-                document.getElementById('new-name').value = '';
-                document.getElementById('new-price').value = '';
-                document.getElementById('new-cat').value = '';
-                await draw();
-            } else {
-                alert("Cloud is full. Try deleting old items.");
-            }
-            btn.innerText = "PUBLISH"; btn.disabled = false;
-        };
-        reader.readAsDataURL(file);
-    } else {
-        alert("Fill all fields!");
-    }
-};
-
-window.removePost = async (id) => {
-    if(confirm("Delete item?")) {
-        let current = await loadFromCloud();
-        current = current.filter(item => item.id !== id);
-        if (await saveToCloud(current)) draw();
+        showNotify("Wrong username or key!", "error");
     }
 };
 
@@ -141,4 +152,4 @@ document.getElementById('open-login-btn').onclick = () => document.getElementByI
 document.getElementById('close-modal').onclick = () => document.getElementById('login-modal').style.display='none';
 document.getElementById('logout-btn').onclick = () => { localStorage.clear(); location.reload(); };
 
-draw();
+render();
