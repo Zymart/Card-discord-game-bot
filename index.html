@@ -4,11 +4,192 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sixssilicious | Nutritious Bites</title>
-    <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0a0a0a;
+            --card: #151515;
+            --accent: #39ff14;
+            --text: #ffffff;
+            --danger: #ff4757;
+        }
+
+        body { 
+            margin: 0; 
+            font-family: 'Montserrat', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            overflow-x: hidden; 
+        }
+
+        /* NAVBAR */
+        nav { 
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(15px); 
+            padding: 12px 0; 
+            border-bottom: 2px solid var(--accent); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+        }
+        .nav-container { 
+            max-width: 1200px; 
+            margin: auto; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0 20px; 
+        }
+        .nav-actions { display: flex; gap: 10px; }
+        .nav-logo { height: 50px; }
+        .logo-text { font-weight: 900; color: var(--accent); letter-spacing: 2px; }
+
+        /* HERO SECTION */
+        .hero { padding: 100px 20px 60px; text-align: center; }
+        .tagline { 
+            color: var(--accent); 
+            font-weight: 700; 
+            letter-spacing: 5px; 
+            font-size: 0.9rem; 
+            text-transform: uppercase; 
+            margin-bottom: 10px; 
+            display: block;
+        }
+        .hero h1 { 
+            font-size: clamp(2.5rem, 10vw, 4.5rem); 
+            font-weight: 900; 
+            margin: 0; 
+            letter-spacing: -2px;
+        }
+        .glow-bar { 
+            width: 80px; 
+            height: 4px; 
+            background: var(--accent); 
+            margin: 25px auto; 
+            box-shadow: 0 0 20px var(--accent); 
+            border-radius: 10px; 
+        }
+
+        /* GRID & CARDS */
+        .container { max-width: 1200px; margin: auto; padding: 20px; }
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 30px; 
+        }
+        .product-card { 
+            background: var(--card); 
+            border-radius: 20px; 
+            overflow: hidden; 
+            border: 1px solid #222; 
+            position: relative;
+            opacity: 0; 
+            transform: translateY(30px);
+            transition: 0.6s ease-out;
+        }
+        .product-card.is-visible { opacity: 1; transform: translateY(0); }
+        .product-card img { width: 100%; height: 280px; object-fit: cover; }
+        .card-content { padding: 20px; text-align: center; }
+        .price-display { color: var(--accent); font-size: 1.6rem; font-weight: 900; }
+
+        /* BUTTONS */
+        .create-trigger { 
+            background: var(--accent); 
+            color: #000; 
+            border: none; 
+            padding: 10px 20px; 
+            font-weight: 900; 
+            border-radius: 8px; 
+            cursor: pointer; 
+        }
+        .admin-trigger {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* MODALS */
+        .modal { 
+            display:none; 
+            position:fixed; 
+            inset:0; 
+            background:rgba(0,0,0,0.95); 
+            z-index:9999; 
+            justify-content:center; 
+            align-items:center; 
+            backdrop-filter: blur(10px);
+        }
+        .glass-box { 
+            background: #111; 
+            border: 1px solid var(--accent); 
+            padding: 40px; 
+            border-radius: 25px; 
+            width: 90%; 
+            max-width: 400px; 
+            text-align: center; 
+        }
+        .input-stack { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; }
+        .input-stack input { 
+            background: #1a1a1a; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 12px; 
+            border-radius: 8px; 
+        }
+
+        /* ADMIN DOCK */
+        .admin-dock { 
+            display: none; 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: #000; 
+            padding: 15px; 
+            z-index: 2000; 
+            border-top: 1px solid #222; 
+        }
+        .dock-container { display: flex; justify-content: center; gap: 15px; }
+        .wipe-btn { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+        .logout-btn { background: var(--danger); color: #fff; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+
+        /* TOASTS */
+        #toast-container { position: fixed; top: 100px; right: 20px; z-index: 10000; }
+        .toast { 
+            background: #1a1a1a; 
+            border-left: 5px solid var(--accent); 
+            color: white; 
+            padding: 15px 25px; 
+            border-radius: 12px; 
+            margin-bottom: 10px; 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .del-btn { 
+            position: absolute; 
+            top: 15px; 
+            right: 15px; 
+            background: var(--danger); 
+            color: white; 
+            border: none; 
+            width: 35px; 
+            height: 35px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            display: none;
+        }
+        body.admin-mode .del-btn { display: block; }
+        .close-link { background: transparent; color: #888; border: none; margin-top: 15px; cursor: pointer; text-decoration: underline; }
+    </style>
 </head>
-<body class="dark-mode">
+<body>
 
     <div id="toast-container"></div>
 
@@ -29,7 +210,7 @@
 
     <header class="hero">
         <div class="hero-content">
-            <p class="tagline">UNANG TIKIM, LASAP MO ANG LALIM</p>
+            <span class="tagline">UNANG TIKIM, LASAP MO ANG LALIM</span>
             <h1>NUTRITIOUS BITES</h1>
             <div class="glow-bar"></div>
         </div>
@@ -41,40 +222,182 @@
 
     <div id="login-modal" class="modal">
         <div class="glass-box">
-            <h3>ADMIN ACCESS</h3>
+            <h3>ADMIN AUTHENTICATION</h3>
             <div class="input-stack">
                 <input type="text" id="user-input" placeholder="Identity">
                 <input type="password" id="pass-input" placeholder="Secure Key">
             </div>
-            <button id="submit-login">UNLOCK</button>
+            <button id="submit-login" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">UNLOCK SYSTEM</button>
             <button id="close-modal" class="close-link">Back</button>
         </div>
     </div>
 
     <div id="product-modal" class="modal">
         <div class="glass-box">
-            <h3>NEW PRODUCT</h3>
+            <h3>CREATE NEW PRODUCT</h3>
             <div class="input-stack">
                 <input type="text" id="new-name" placeholder="Item Name">
                 <input type="number" id="new-price" placeholder="Price (₱)">
                 <input type="text" id="new-cat" placeholder="Category">
-                <label class="file-btn">
-                    <span>📷 IMAGE</span>
-                    <input type="file" id="new-image-file" accept="image/*">
-                </label>
+                <input type="file" id="new-image-file" accept="image/*" style="color:#fff;">
             </div>
-            <button id="add-btn">PUBLISH</button>
+            <button id="add-btn" style="width:100%; padding:12px; background:var(--accent); border:none; border-radius:8px; font-weight:bold; cursor:pointer;">PUBLISH ITEM</button>
             <button id="close-product-modal" class="close-link">Cancel</button>
         </div>
     </div>
 
     <div id="admin-panel" class="admin-dock">
         <div class="dock-container">
-            <button id="wipe-btn" class="wipe-btn">WIPE ALL</button>
-            <button id="logout-btn" class="logout-btn">LOGOUT</button>
+            <button id="wipe-btn" class="wipe-btn">WIPE ALL DATA</button>
+            <button id="logout-btn" class="logout-btn">LOGOUT SESSION</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const BIN_ID = '698dbb6d43b1c97be9795688';
+        const API_KEY = '$2a$10$McXg3fOwbLYW3Sskgfroj.nzMjtwwubDEz08zXpBN32KQ.8MvCJgK';
+
+        function showNotify(msg, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            if(type === 'error') toast.style.borderLeftColor = 'var(--danger)';
+            toast.innerHTML = `<span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+        }
+
+        async function optimizeImage(base64Str) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.src = base64Str;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_W = 400; 
+                    const scale = MAX_W / img.width;
+                    canvas.width = MAX_W;
+                    canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.4));
+                };
+            });
+        }
+
+        async function loadCloud() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, { headers: { 'X-Master-Key': API_KEY } });
+                const data = await res.json();
+                return data.recipes || [];
+            } catch (e) { return []; }
+        }
+
+        async function saveCloud(data) {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json', 'X-Master-Key': API_KEY },
+                    body: JSON.stringify({ "recipes": data })
+                });
+                return res.ok;
+            } catch (e) { return false; }
+        }
+
+        let scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, idx) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => { entry.target.classList.add('is-visible'); }, idx * 100);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        async function render() {
+            const items = await loadCloud();
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = '';
+            scrollObserver.disconnect();
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <button class="del-btn" onclick="deleteItem('${item.id}')">×</button>
+                    <img src="${item.img}">
+                    <div class="card-content">
+                        <small style="color:var(--accent)">${item.cat || 'SNACK'}</small>
+                        <h3 style="margin:5px 0;">${item.name}</h3>
+                        <div class="price-display">₱${item.price}</div>
+                    </div>
+                `;
+                grid.appendChild(card);
+                scrollObserver.observe(card);
+            });
+        }
+
+        // MODAL LOGIC
+        const pModal = document.getElementById('product-modal');
+        const lModal = document.getElementById('login-modal');
+
+        document.getElementById('open-product-modal').onclick = () => pModal.style.display = 'flex';
+        document.getElementById('close-product-modal').onclick = () => pModal.style.display = 'none';
+        document.getElementById('open-login-btn').onclick = () => lModal.style.display = 'flex';
+        document.getElementById('close-modal').onclick = () => lModal.style.display = 'none';
+
+        document.getElementById('add-btn').onclick = async () => {
+            const name = document.getElementById('new-name').value;
+            const price = document.getElementById('new-price').value;
+            const cat = document.getElementById('new-cat').value;
+            const file = document.getElementById('new-image-file').files[0];
+
+            if (!name || !price || !file) { showNotify("Complete all fields", "error"); return; }
+
+            document.getElementById('add-btn').innerText = "PUBLISHING...";
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const smallImg = await optimizeImage(e.target.result);
+                let list = await loadCloud();
+                list.push({ id: Date.now().toString(), name, price, cat, img: smallImg });
+                if (await saveCloud(list)) {
+                    location.reload();
+                } else {
+                    showNotify("Storage Full! Wipe data.", "error");
+                    document.getElementById('add-btn').innerText = "PUBLISH ITEM";
+                }
+            };
+            reader.readAsDataURL(file);
+        };
+
+        document.getElementById('wipe-btn').onclick = async () => {
+            if(confirm("Delete ALL products?")) {
+                if(await saveCloud([])) location.reload();
+            }
+        };
+
+        window.deleteItem = async (id) => {
+            if(!confirm("Delete this?")) return;
+            let list = await loadCloud();
+            list = list.filter(i => i.id !== id);
+            if(await saveCloud(list)) render();
+        };
+
+        if (localStorage.getItem('snb_auth') === 'true') {
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('open-product-modal').style.display = 'block';
+            document.body.classList.add('admin-mode');
+            document.getElementById('open-login-btn').style.display = 'none';
+        }
+
+        document.getElementById('submit-login').onclick = () => {
+            const u = document.getElementById('user-input').value;
+            const p = document.getElementById('pass-input').value;
+            if (["Zymart", "Brigette", "Lance", "Taduran"].includes(u) && p === "sixssiliciousteam") {
+                localStorage.setItem('snb_auth', 'true');
+                location.reload();
+            } else { showNotify("Invalid login", "error"); }
+        };
+
+        document.getElementById('logout-btn').onclick = () => { localStorage.clear(); location.reload(); };
+
+        render();
+    </script>
 </body>
 </html>
