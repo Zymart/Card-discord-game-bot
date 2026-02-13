@@ -1,7 +1,7 @@
 const BIN_ID = '698dbb6d43b1c97be9795688';
 const API_KEY = '$2a$10$McXg3fOwbLYW3Sskgfroj.nzMjtwwubDEz08zXpBN32KQ.8MvCJgK';
 
-// TOAST SYSTEM
+// NOTIFICATIONS
 function showNotify(msg, type = 'success') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -11,25 +11,26 @@ function showNotify(msg, type = 'success') {
     setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 4000);
 }
 
-// IMAGE COMPRESSOR
+// ULTRA COMPRESSION (The Storage Fix)
 async function optimizeImage(base64Str) {
     return new Promise((resolve) => {
         const img = new Image();
         img.src = base64Str;
         img.onload = () => {
             const canvas = document.createElement('canvas');
-            const MAX_W = 600;
+            const MAX_W = 500; // Small but clear on mobile
             const scale = MAX_W / img.width;
             canvas.width = MAX_W;
             canvas.height = img.height * scale;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            resolve(canvas.toDataURL('image/jpeg', 0.6));
+            // 0.5 quality saves massive amounts of text space
+            resolve(canvas.toDataURL('image/jpeg', 0.5));
         };
     });
 }
 
-// CLOUD STORAGE
+// CLOUD
 async function loadCloud() {
     try {
         const res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest?meta=false`, { headers: { 'X-Master-Key': API_KEY } });
@@ -49,42 +50,29 @@ async function saveCloud(data) {
     } catch (e) { return false; }
 }
 
-// ANIMATION OBSERVER
+// ANIMATION
 let scrollObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry, idx) => {
         if (entry.isIntersecting) {
-            setTimeout(() => {
-                entry.target.classList.add('is-visible');
-            }, idx * 100);
+            setTimeout(() => { entry.target.classList.add('is-visible'); }, idx * 100);
         }
     });
 }, { threshold: 0.1 });
 
-// RENDER FUNCTION
 async function render() {
     const items = await loadCloud();
     const grid = document.getElementById('product-grid');
     grid.innerHTML = '';
-    
-    // Reset Observer
     scrollObserver.disconnect();
-    scrollObserver = new IntersectionObserver((entries) => {
-        entries.forEach((entry, idx) => {
-            if (entry.isIntersecting) {
-                setTimeout(() => { entry.target.classList.add('is-visible'); }, idx * 80);
-            }
-        });
-    }, { threshold: 0.1 });
-
     items.forEach(item => {
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
-            <button class="del-btn" onclick="deleteItem('${item.id}')">×</button>
+            <button class="del-btn" onclick="deleteItem('${item.id}')" style="display:${localStorage.getItem('snb_auth')==='true'?'block':'none'}">×</button>
             <img src="${item.img}">
             <div class="card-content">
                 <span class="cat-label">${item.cat || 'NUTRITIOUS'}</span>
-                <h3 style="margin:5px 0;">${item.name}</h3>
+                <h3>${item.name}</h3>
                 <span class="price-display">₱${item.price}</span>
             </div>
         `;
@@ -93,7 +81,7 @@ async function render() {
     });
 }
 
-// ADMIN MODAL & ACTIONS
+// UI HANDLERS
 const productModal = document.getElementById('product-modal');
 document.getElementById('open-product-modal').onclick = () => productModal.style.display = 'flex';
 document.getElementById('close-product-modal').onclick = () => productModal.style.display = 'none';
@@ -104,10 +92,10 @@ document.getElementById('add-btn').onclick = async () => {
     const cat = document.getElementById('new-cat').value;
     const file = document.getElementById('new-image-file').files[0];
 
-    if (!name || !price || !file) { showNotify("Missing info!", "error"); return; }
+    if (!name || !price || !file) { showNotify("Incomplete form", "error"); return; }
 
     const btn = document.getElementById('add-btn');
-    btn.innerText = "PUBLISHING..."; btn.disabled = true;
+    btn.innerText = "OPTIMIZING..."; btn.disabled = true;
 
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -116,19 +104,29 @@ document.getElementById('add-btn').onclick = async () => {
         list.push({ id: Date.now().toString(), name, price, cat, img: smallImg });
 
         if (await saveCloud(list)) {
-            showNotify(`${name} added!`);
+            showNotify(`${name} published!`);
             productModal.style.display = 'none';
-            document.getElementById('new-name').value = '';
-            document.getElementById('new-price').value = '';
             render();
-        } else { showNotify("Storage Full!", "error"); }
+        } else {
+            showNotify("STORAGE FULL! Clear data first.", "error");
+        }
         btn.innerText = "PUBLISH ITEM"; btn.disabled = false;
     };
     reader.readAsDataURL(file);
 };
 
+// WIPE FUNCTION (To clear hidden junk)
+document.getElementById('wipe-btn').onclick = async () => {
+    if(confirm("DANGER: This will delete everything! Are you sure?")) {
+        if(await saveCloud([])) {
+            showNotify("Storage Cleared!");
+            render();
+        }
+    }
+};
+
 window.deleteItem = async (id) => {
-    if(!confirm("Delete this?")) return;
+    if(!confirm("Delete?")) return;
     let list = await loadCloud();
     list = list.filter(i => i.id !== id);
     if(await saveCloud(list)) { showNotify("Deleted."); render(); }
@@ -148,7 +146,7 @@ document.getElementById('submit-login').onclick = () => {
     if (["Zymart", "Brigette", "Lance", "Taduran"].includes(u) && p === "sixssiliciousteam") {
         localStorage.setItem('snb_auth', 'true');
         location.reload();
-    } else { showNotify("Wrong Key", "error"); }
+    } else { showNotify("Invalid Auth", "error"); }
 };
 
 document.getElementById('open-login-btn').onclick = () => document.getElementById('login-modal').style.display='flex';
