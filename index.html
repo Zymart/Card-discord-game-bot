@@ -46,16 +46,28 @@
         </div>
     </div>
 
+    <div id="product-modal" class="modal">
+        <div class="glass-box">
+            <h3>CREATE NEW PRODUCT</h3>
+            <div class="input-stack">
+                <input type="text" id="new-name" placeholder="Item Name">
+                <input type="number" id="new-price" placeholder="Price (₱)">
+                <input type="text" id="new-cat" placeholder="Category (e.g., Drinks)">
+                <label class="file-btn">
+                    <span>📷 SELECT IMAGE</span>
+                    <input type="file" id="new-image-file" accept="image/*">
+                </label>
+            </div>
+            <button id="add-btn">PUBLISH ITEM</button>
+            <button id="close-product-modal" class="close-link">Cancel</button>
+        </div>
+    </div>
+
     <div id="admin-panel" class="admin-dock">
         <div class="dock-container">
-            <input type="text" id="new-name" placeholder="Item Name">
-            <input type="number" id="new-price" placeholder="Price (₱)">
-            <input type="text" id="new-cat" placeholder="Category">
-            <label class="file-btn">
-                <span>📷 IMG</span>
-                <input type="file" id="new-image-file" accept="image/*">
-            </label>
-            <button id="add-btn">PUBLISH</button>
+            <button id="open-product-modal" class="create-trigger">
+                <i class="fa-solid fa-plus"></i> CREATE A PRODUCT
+            </button>
             <button id="logout-btn" class="logout-btn">LOGOUT</button>
         </div>
     </div>
