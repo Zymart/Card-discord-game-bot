@@ -18,7 +18,12 @@
                 <img src="1000041430.png" alt="SNB Logo" class="nav-logo">
                 <span class="logo-text">SIXSSILICIOUS</span>
             </div>
-            <button id="open-login-btn" class="admin-trigger">PORTAL ACCESS</button>
+            <div class="nav-actions">
+                <button id="open-product-modal" class="create-trigger" style="display:none;">
+                    <i class="fa-solid fa-plus"></i> CREATE
+                </button>
+                <button id="open-login-btn" class="admin-trigger">PORTAL ACCESS</button>
+            </div>
         </div>
     </nav>
 
@@ -52,7 +57,7 @@
             <div class="input-stack">
                 <input type="text" id="new-name" placeholder="Item Name">
                 <input type="number" id="new-price" placeholder="Price (₱)">
-                <input type="text" id="new-cat" placeholder="Category (e.g., Drinks)">
+                <input type="text" id="new-cat" placeholder="Category">
                 <label class="file-btn">
                     <span>📷 SELECT IMAGE</span>
                     <input type="file" id="new-image-file" accept="image/*">
@@ -65,10 +70,7 @@
 
     <div id="admin-panel" class="admin-dock">
         <div class="dock-container">
-            <button id="open-product-modal" class="create-trigger">
-                <i class="fa-solid fa-plus"></i> CREATE A PRODUCT
-            </button>
-            <button id="logout-btn" class="logout-btn">LOGOUT</button>
+            <button id="logout-btn" class="logout-btn">LOGOUT SESSION</button>
         </div>
     </div>
 
